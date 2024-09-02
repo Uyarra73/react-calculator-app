@@ -4,37 +4,63 @@ import "./App.css";
 
 function App() {
   const [display, setDisplay] = useState("0");
+  const [lastKey, setLastKey] = useState("");
 
   const handleClick = (e) => {
     const currentDisplay = e.target.textContent;
-    if (display === "0") {
+    if (display === "0" || lastKey === "=") {
       setDisplay(currentDisplay);
     } else {
-      setDisplay(display + e.target.textContent);
+      setDisplay(display + currentDisplay);
     }
+    setLastKey(currentDisplay);
   };
 
   const handleClear = () => {
     setDisplay("0");
+    setLastKey("");
   };
 
   const handleOperator = (e) => {
     const operator = e.target.textContent;
+    const lastChar = display[display.length - 1];
 
-    setDisplay(display + " " + operator + " ");
+    // Check if the last character is an operator
+    if (/[\+\-\*\/]$/.test(lastChar)) {
+      // If the last operator is a minus sign and the new operator is also a minus sign, allow it
+      if (operator === '-' && lastChar !== '-') {
+        setDisplay(display + operator);
+      } 
+      // Replace the last operator with the new operator
+      else if (operator !== '-' || (operator === '-' && /[\+\*\/]$/.test(display.slice(0, -1)))) {
+        setDisplay(display.slice(0, -1) + operator);
+      }
+    } else {
+      // Append the operator normally
+      setDisplay(display + " " + operator + " ");
+    }
+    setLastKey(operator);
   };
 
   const handleDecimal = () => {
-    const array = display.split(" ");
-    const last = array[array.length - 1];
+    const parts = display.split(/[\+\-\*\/\s]/); // Split by operators and spaces
+    const lastPart = parts[parts.length - 1];
 
-    if (!last.includes(".")) {
+    if (!lastPart.includes(".")) {
       setDisplay(display + ".");
+      setLastKey(".");
     }
   };
 
   const handleEqual = () => {
-    setDisplay(evaluate(display));
+    try {
+      const result = evaluate(display.replace(/ /g, "")); // Remove spaces
+      setDisplay(result.toString());
+      setLastKey("=");
+    } catch (error) {
+      setDisplay("Error");
+      console.error("Error evaluating expression:", error);
+    }
   };
 
   return (
