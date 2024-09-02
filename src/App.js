@@ -65,6 +65,7 @@ function App() {
 
   return (
     <div className="App">
+      <h1>Simple Calculator</h1>
       <div className="calculator">
         <div id="display" className="row">
           {display}
