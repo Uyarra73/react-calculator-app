@@ -27,17 +27,15 @@ function App() {
 
     // Check if the last character is an operator
     if (/[\+\-\*\/]$/.test(lastChar)) {
-      // If the last operator is a minus sign and the new operator is also a minus sign, allow it
-      if (operator === '-' && lastChar !== '-') {
+      if (operator === '-') {
+        // Allow negative sign immediately after another operator
         setDisplay(display + operator);
-      } 
-      // Replace the last operator with the new operator
-      else if (operator !== '-' || (operator === '-' && /[\+\*\/]$/.test(display.slice(0, -1)))) {
+      } else {
+        // Replace the last operator with the new operator
         setDisplay(display.slice(0, -1) + operator);
       }
     } else {
-      // Append the operator normally
-      setDisplay(display + " " + operator + " ");
+      setDisplay(display + operator);
     }
     setLastKey(operator);
   };
@@ -54,7 +52,8 @@ function App() {
 
   const handleEqual = () => {
     try {
-      const result = evaluate(display.replace(/ /g, "")); // Remove spaces
+      // Evaluate the expression
+      const result = evaluate(display.replace(/ /g, ""));
       setDisplay(result.toString());
       setLastKey("=");
     } catch (error) {
@@ -65,7 +64,7 @@ function App() {
 
   return (
     <div className="App">
-      <h1>Simple Calculator</h1>
+      <h1>Simple React Calculator</h1>
       <div className="calculator">
         <div id="display" className="row">
           {display}
