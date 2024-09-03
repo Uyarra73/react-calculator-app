@@ -2,12 +2,13 @@ import { useState } from "react";
 import { evaluate } from "mathjs";
 import "./App.css";
 
-function App() {
+const App = () => {
   const [display, setDisplay] = useState("0");
   const [lastKey, setLastKey] = useState("");
 
   const handleClick = (e) => {
     const currentDisplay = e.target.textContent;
+
     if (display === "0" || lastKey === "=") {
       setDisplay(currentDisplay);
     } else {
@@ -25,13 +26,13 @@ function App() {
     const operator = e.target.textContent;
     const lastChar = display[display.length - 1];
 
-    // Check if the last character is an operator
-    if (/[\+\-\*\/]$/.test(lastChar)) {
-      if (operator === '-') {
-        // Allow negative sign immediately after another operator
+    // Verificar si el último carácter es un operador
+    if (/[+\-*/]$/.test(lastChar)) {
+      if (operator === '-' && lastChar !== '-') {
+        // Permitir el signo negativo inmediatamente después de otro operador que no sea '-'
         setDisplay(display + operator);
       } else {
-        // Replace the last operator with the new operator
+        // Reemplazar el último operador con el nuevo operador
         setDisplay(display.slice(0, -1) + operator);
       }
     } else {
@@ -41,24 +42,21 @@ function App() {
   };
 
   const handleDecimal = () => {
-    const parts = display.split(/[\+\-\*\/\s]/); // Split by operators and spaces
-    const lastPart = parts[parts.length - 1];
+    const lastNum = display.split(/[+\-*/]/).pop(); // obtener el último número
 
-    if (!lastPart.includes(".")) {
+    if (!lastNum.includes(".")) {
       setDisplay(display + ".");
-      setLastKey(".");
     }
+    setLastKey(".");
   };
 
   const handleEqual = () => {
     try {
-      // Evaluate the expression
-      const result = evaluate(display.replace(/ /g, ""));
+      const result = evaluate(display.replace(/--/g, "+"));
       setDisplay(result.toString());
       setLastKey("=");
     } catch (error) {
       setDisplay("Error");
-      console.error("Error evaluating expression:", error);
     }
   };
 
@@ -123,6 +121,6 @@ function App() {
       </div>
     </div>
   );
-}
+};
 
 export default App;
